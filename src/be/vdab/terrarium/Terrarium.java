@@ -19,10 +19,7 @@ public class Terrarium implements TerrariumInterface{
 	private Organism[][] organisms = new Organism[rows][cols];
 	private int organismCount = 0;
 	private int dayCount = 1;
-	
-	
-	private boolean terrariumVol = false;
-	
+		
 	public Terrarium() {
 		init();
 	}
@@ -78,7 +75,6 @@ public class Terrarium implements TerrariumInterface{
 				
 	}
 			
-	 
 	public void nextDay() throws TerrariumException{
 			
 		//increase day counter
@@ -214,7 +210,7 @@ public class Terrarium implements TerrariumInterface{
 						}
 						break;
 					case 2:
-						if (organism1.getCoordinate().getCol() == 5) { break; }
+						if (organism1.getCoordinate().getCol() == this.getCols() - 1) { break; }
 						Organism east = organisms[organism1.getCoordinate().getRow()][organism1.getCoordinate().getCol()+1];
 						nieuwePos = east.getCoordinate();
 						swapOrganisms(huidigePos, nieuwePos);
@@ -222,7 +218,7 @@ public class Terrarium implements TerrariumInterface{
 						System.out.println("I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I moved one step to the east!!!");
 						break;
 					case 3:
-						if (organism1.getCoordinate().getRow() == 5) { break; }
+						if (organism1.getCoordinate().getRow() == this.getRows() - 1) { break; }
 						Organism south = organisms[organism1.getCoordinate().getRow()+1][organism1.getCoordinate().getCol()];
 						if (south instanceof EmptyOrganism) {
 							nieuwePos = south.getCoordinate();
