@@ -6,18 +6,18 @@ This is a java console application that represents a terrarium. The terrarium is
 When the program starts, some organisms (human, leopard, buffalo, palm tree) are added to the terrarium and the first day (matrix) is shown.
 
 The user can now choose to see the next day. That's when the action begins.
-Each organism tries to interact with the organism to it's right side.
+Each organism tries to interact with the organism on it's right side.
 
 A human can fight another human or a leopard.
-A human can move one step to the north, east, south or west if there is no organism to it's right side.
+A human can move one step to the north, east, south or west if there is no organism on it's right side.
 
 A leopard can eat a buffalo.
 A leopard can fight a human or another leopard
-A leopard can move one step to the north, east, south or west if there is no organism to it's right side.
+A leopard can move one step to the north, east, south or west if there is no organism on it's right side.
 
 A buffalo can eat a palm tree.
 A buffalo can make love with another buffalo, a new buffalo is born and added to the terrarium.
-A buffalo can move one step to the north, east, south or west if there is no organism to it's right side.
+A buffalo can move one step to the north, east, south or west if there is no organism on it's right side.
 
 A palm tree can only be eaten by the buffalo
 
