@@ -8,11 +8,11 @@ import be.vdab.terrarium.TerrariumException;
 public class Main {
 
 	public static void main(String[] args) {
-		Terrarium terrarium = new Terrarium();
-		String keuze;
 		
 		System.out.println("TERRARIUM");
 		System.out.println("*********\n");
+		Terrarium terrarium = new Terrarium();
+		String keuze;
 		
 		terrarium.print();
 				

@@ -130,7 +130,7 @@ public class Terrarium implements TerrariumInterface{
 		}
 		//Check if terrarium is full, then throw exception
 		if(this.getOrganismCount() >= this.getRows() * this.getCols()) {
-			throw new TerrariumException("Terrarium is volgelopen, programma wordt beëindig!");
+			throw new TerrariumException("\nTerrarium is full, program is being terminated!");
 		}
 	}
 	
@@ -162,10 +162,9 @@ public class Terrarium implements TerrariumInterface{
 			//increase organism count
 			if(! (org instanceof EmptyOrganism)) {
 				this.setOrganismCount(this.getOrganismCount() + 1);
+				System.out.println(org.getClass().getSimpleName() + " was added to the terrarium!");
 			}
-			System.out.println(org.getClass().getSimpleName() + " was added to the terrarium!\n");
 		}
-		
 	}
 
 	@Override
@@ -255,7 +254,7 @@ public class Terrarium implements TerrariumInterface{
 	}
 	
 	public void print() {
-		System.out.println("Day " + dayCount + ":");
+		System.out.println("\nDay " + dayCount + ":");
 		System.out.println("*********\n");
 		for(int i = 0; i < rows; i++) {
 			for(int j = 0; j < cols; j++) {

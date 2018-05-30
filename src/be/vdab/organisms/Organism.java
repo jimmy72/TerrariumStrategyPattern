@@ -80,7 +80,7 @@ public abstract class Organism {
 		if(coordinate != null && coordinate.getRow() != -1) {
 			this.coordinate = coordinate;
 		}else {
-			throw new TerrariumException("Terrarium is volgelopen, niet mogelijk om nieuw organisme toe te voegen!!!");
+			throw new TerrariumException("Terrarium is full, not possible to add another organism!\n");
 		}
 		
 	}
