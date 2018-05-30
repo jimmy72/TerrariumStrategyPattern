@@ -8,7 +8,7 @@ import be.vdab.organisms.Buffalo;
 import be.vdab.organisms.Coordinate;
 import be.vdab.organisms.EmptyOrganism;
 import be.vdab.organisms.Human;
-import be.vdab.organisms.Hyena;
+import be.vdab.organisms.Leopard;
 import be.vdab.organisms.Organism;
 import be.vdab.organisms.PalmTree;
 
@@ -37,7 +37,7 @@ public class Terrarium implements TerrariumInterface{
 			}
 		}
 		
-		//toevoegen van 2 palmbomen
+		//add palmtrees
 		try {
 			for(int i=1; i<=3;i++) {
 				addOrganism(new PalmTree(getCoordinate(), this));
@@ -46,7 +46,7 @@ public class Terrarium implements TerrariumInterface{
 			System.out.println(e.getMessage());
 		}
 		
-		//toevoegen van 2 mensen
+		//add humans
 		try {
 			for(int i=1; i<=2;i++) {
 				addOrganism(new Human(getCoordinate(), this));
@@ -55,30 +55,28 @@ public class Terrarium implements TerrariumInterface{
 			System.out.println(e.getMessage());
 		}
 		
-		//toevoegen van 4 buffalos
+		//add leopards
 		try {
 			for(int i=1; i<=3;i++) {
-				addOrganism(new Buffalo(getCoordinate(), this));
+				addOrganism(new Leopard(getCoordinate(), this));
 			}
 		} catch (TerrariumException e) {
 			System.out.println(e.getMessage());
 		}
 		
-		//toevoegen van 3 hyenas
+		//add buffalos
 		try {
-			for(int i=1; i<=3;i++) {
-				addOrganism(new Hyena(getCoordinate(), this));
+			for(int i=1; i<=4;i++) {
+				addOrganism(new Buffalo(getCoordinate(), this));
 			}
 		} catch (TerrariumException e) {
 			System.out.println(e.getMessage());
 		}
-				
 	}
 			
 	public void nextDay() throws TerrariumException{
-			
 		//increase day counter
-		this.dayCount++;
+		this.setDayCount(this.getDayCount() + 1);
 		
 		Organism organism1;
 		Organism organism2;
@@ -91,17 +89,19 @@ public class Terrarium implements TerrariumInterface{
 			}
 		}
 		
-		int orgCount = 0;
+		int count = 0;
 		
 		for(int i = 0; i < rows; i++) {
 			for(int j = 0; j < cols-1; j++) {
 				
 				organism1 = organisms[i][j];
 				organism2 = organisms[i][j+1];
-				orgCount++;
-				System.out.println("ORGANISM " + orgCount + " WANTS TO HAVE SOME ACTION:");
+				
+				count++;
+				System.out.println("ORGANISM " + count + " WANTS TO HAVE SOME ACTION:");
+				
 				if (organism1.isDailyActionPerformed() ) {
-					System.out.println("Sorry, I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I already had some action today");
+					System.out.println("Sorry, I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I already moved today!");
 				}else {
 					if (! organism1.isDailyActionPerformed() ) {
 						organism1.tryToEat(organism2);
@@ -113,14 +113,14 @@ public class Terrarium implements TerrariumInterface{
 						organism1.tryToMakeLove(organism2);
 					}
 					if (! organism1.isDailyActionPerformed() ) {
-						tryToMove(organism1, organism2);
+						organism1.tryToMove();
 					}
 				}
 				System.out.println();
 			}
 		}
 		
-		//Add a palm trees
+		//Add palm trees
 		try {
 			for(int i=1; i<=1;i++) {
 				addOrganism(new PalmTree(getCoordinate(), this));
@@ -128,12 +128,11 @@ public class Terrarium implements TerrariumInterface{
 		} catch (TerrariumException e) {
 			System.out.println(e.getMessage());
 		}
-		
+		//Check if terrarium is full, then throw exception
 		if(this.getOrganismCount() >= this.getRows() * this.getCols()) {
 			throw new TerrariumException("Terrarium is volgelopen, programma wordt beëindig!");
 		}
 	}
-	
 	
 	
 	public Coordinate getCoordinate() {
@@ -148,7 +147,6 @@ public class Terrarium implements TerrariumInterface{
 			while(!isFound) {
 				if(organisms[coordinate.getRow()][coordinate.getCol()] instanceof EmptyOrganism ) {
 					isFound = true;
-					//System.out.println(coordinate[0]+ ", " + coordinate[1]);
 				}else {
 					coordinate = new Coordinate(rand.nextInt(rows),rand.nextInt(cols));
 				}
@@ -179,74 +177,93 @@ public class Terrarium implements TerrariumInterface{
 			this.setOrganismCount(this.getOrganismCount() - 1);
 			System.out.println(org.getClass().getSimpleName() + " was removed from terrarium!!!");
 		} catch (TerrariumException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 	}
 	
-	public void tryToMove(Organism organism1, Organism organism2) {
-		if(organism1 instanceof Animal && organism2 instanceof EmptyOrganism) {
-			boolean moved = false;
-			Coordinate huidigePos = organism1.getCoordinate();
-			Coordinate nieuwePos;
-			while (!moved) {
-				// random getal "richting" van 1-4
-				Random rand = new Random();
-				int richting = rand.nextInt(4)+1;
-				// switch volgens "richting"
-				switch (richting) {
-					case 1:
-						if (organism1.getCoordinate().getRow() == 0) { break; }
-						Organism north = organisms[organism1.getCoordinate().getRow()-1][organism1.getCoordinate().getCol()];
-						if (north instanceof EmptyOrganism) {
-							nieuwePos = north.getCoordinate();
+	@Override
+	public void moveOrganism(Organism organism) {
+		Coordinate huidigePos = organism.getCoordinate();
+		//controle of organisme zich niet in de uiterst rechtse kolom bevindt
+		if(huidigePos.getCol() < this.getCols() - 1) {  
+			Organism organismEast = organisms[huidigePos.getRow()][huidigePos.getCol() + 1];
+			if(organism instanceof Animal && organismEast instanceof EmptyOrganism) {
+				Coordinate nieuwePos;
+				boolean moved = false;
+				while (!moved) {
+					// random getal "richting" van 1-4
+					Random rand = new Random();
+					int richting = rand.nextInt(4)+1;
+					// switch volgens "richting"
+					switch (richting) {
+						case 1:
+							if (organism.getCoordinate().getRow() == 0) { break; }
+							Organism north = organisms[organism.getCoordinate().getRow()-1][organism.getCoordinate().getCol()];
+							if (north instanceof EmptyOrganism) {
+								nieuwePos = north.getCoordinate();
+								swapOrganisms(huidigePos, nieuwePos);
+								moved = true;
+								System.out.println("I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I moved one step to the north!");
+							} else {
+								moved = false;
+							}
+							break;
+						case 2:
+							if (organism.getCoordinate().getCol() == this.getCols() - 1) { break; }
+							Organism east = organisms[organism.getCoordinate().getRow()][organism.getCoordinate().getCol()+1];
+							nieuwePos = east.getCoordinate();
 							swapOrganisms(huidigePos, nieuwePos);
 							moved = true;
-							System.out.println("I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I moved one step to the north!!!");
-						} else {
-							moved = false;
-						}
-						break;
-					case 2:
-						if (organism1.getCoordinate().getCol() == this.getCols() - 1) { break; }
-						Organism east = organisms[organism1.getCoordinate().getRow()][organism1.getCoordinate().getCol()+1];
-						nieuwePos = east.getCoordinate();
-						swapOrganisms(huidigePos, nieuwePos);
-						moved = true;
-						System.out.println("I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I moved one step to the east!!!");
-						break;
-					case 3:
-						if (organism1.getCoordinate().getRow() == this.getRows() - 1) { break; }
-						Organism south = organisms[organism1.getCoordinate().getRow()+1][organism1.getCoordinate().getCol()];
-						if (south instanceof EmptyOrganism) {
-							nieuwePos = south.getCoordinate();
-							swapOrganisms(huidigePos, nieuwePos);
-							moved = true;
-							System.out.println("I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I moved one step to the south!!!");
-						} else {
-							moved = false;
-						}
-						break;
-					case 4:
-						if (organism1.getCoordinate().getCol() == 0) { break; }
-						Organism west = organisms[organism1.getCoordinate().getRow()][organism1.getCoordinate().getCol()-1];
-						if (west instanceof EmptyOrganism) {
-							nieuwePos = west.getCoordinate();
-							swapOrganisms(huidigePos, nieuwePos);
-							moved = true;
-							System.out.println("I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I moved one step to the west!!!");
-						} else {
-							moved = false;
-						}
-						break;
+							System.out.println("I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I moved one step to the east!");
+							break;
+						case 3:
+							if (organism.getCoordinate().getRow() == this.getRows() - 1) { break; }
+							Organism south = organisms[organism.getCoordinate().getRow()+1][organism.getCoordinate().getCol()];
+							if (south instanceof EmptyOrganism) {
+								nieuwePos = south.getCoordinate();
+								swapOrganisms(huidigePos, nieuwePos);
+								moved = true;
+								System.out.println("I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I moved one step to the south!");
+							} else {
+								moved = false;
+							}
+							break;
+						case 4:
+							if (organism.getCoordinate().getCol() == 0) { break; }
+							Organism west = organisms[organism.getCoordinate().getRow()][organism.getCoordinate().getCol()-1];
+							if (west instanceof EmptyOrganism) {
+								nieuwePos = west.getCoordinate();
+								swapOrganisms(huidigePos, nieuwePos);
+								moved = true;
+								System.out.println("I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I moved one step to the west!");
+							} else {
+								moved = false;
+							}
+							break;
+					}
 				}
+				//organism has moved
+				organism.setDailyActionPerformed(true);
+			}else if(organism instanceof Animal){
+				System.out.println("Sorry, I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I can't move because the position to the right is not empty!");
+			}else {
+				System.out.println("Sorry, I'm a " + organism.getClass().getSimpleName().toLowerCase() + " and I can't move at all!");
 			}
-		}else if(organism1 instanceof Animal){
-			System.out.println("Sorry, I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I can't move because the position to the right is not empty!!!");
 		}else {
-			System.out.println("Sorry, I'm a " + organism1.getClass().getSimpleName().toLowerCase() + " and I can't move at all!!!");
+			System.out.println("Sorry, I can't move because I'm in the far right of the terrarium!");
+		}
+	}
+	
+	public void print() {
+		System.out.println("Day " + dayCount + ":");
+		System.out.println("*********\n");
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < cols; j++) {
+			//System.out.print(organisms[i][j].draw()+ "   ");
+				System.out.print(organisms[i][j].draw()+ "(" + organisms[i][j].getLifeForce()+ ")" + "   ");
+				
+			}
+			System.out.println();
 		}
 	}
 	
@@ -290,19 +307,6 @@ public class Terrarium implements TerrariumInterface{
 		this.cols = cols;
 	}
 	
-	public void print() {
-		System.out.println("Day " + dayCount + ":");
-		System.out.println("*********\n");
-		for(int i = 0; i < rows; i++) {
-			for(int j = 0; j < cols; j++) {
-			//System.out.print(organisms[i][j].draw()+ "   ");
-				System.out.print(organisms[i][j].draw()+ "(" + organisms[i][j].getLifeForce()+ ")" + "   ");
-				
-			}
-			System.out.println();
-		}
-	}
-	
 	private void swapOrganisms(Coordinate c1, Coordinate c2) {
 		//Swap objects
 		Organism temp = organisms[c1.getRow()][c1.getCol()];
@@ -312,14 +316,11 @@ public class Terrarium implements TerrariumInterface{
 		try {
 			organisms[c1.getRow()][c1.getCol()].setCoordinate(c1);
 		} catch (TerrariumException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			organisms[c2.getRow()][c2.getCol()].setCoordinate(c2);
-			organisms[c2.getRow()][c2.getCol()].setDailyActionPerformed(true);
 		} catch (TerrariumException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -336,4 +337,5 @@ public class Terrarium implements TerrariumInterface{
 		}
 		return (teller == 0) ? false : true;
 	}
+
 }

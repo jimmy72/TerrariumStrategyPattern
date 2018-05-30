@@ -97,5 +97,9 @@ public abstract class Organism {
 		this.loveBehavior.makeLove(this, lover);
 	}
 	
+	public void tryToMove() {
+		this.getTerrariumInterface().moveOrganism(this);
+	}
+	
 	public abstract char draw();
 }
