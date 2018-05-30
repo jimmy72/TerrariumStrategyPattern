@@ -1,5 +1,5 @@
 # TerrariumStrategyPattern
-A terrarium designed with the strategy pattern (java console application)
+A terrarium designed with the strategy pattern (java console application). See ClassDiagram.jpg
 
 This is a java console application that represents a terrarium. The terrarium is a two dimensional array (6 x 6).
 
