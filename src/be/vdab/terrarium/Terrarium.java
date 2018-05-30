@@ -134,7 +134,6 @@ public class Terrarium implements TerrariumInterface{
 		}
 	}
 	
-	
 	public Coordinate getCoordinate() {
 		//Return a coordinate of free location within terrarium. If full coordinate = -1,-1 
 		Coordinate coordinate;
